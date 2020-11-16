@@ -1,0 +1,24 @@
+PODS:
+  - BartyCrouch (4.3.1)
+  - SwiftGen (6.4.0)
+  - SwiftLint (0.41.0)
+
+DEPENDENCIES:
+  - BartyCrouch (~> 4.3.1)
+  - SwiftGen (~> 6.4.0)
+  - SwiftLint (~> 0.41.0)
+
+SPEC REPOS:
+  trunk:
+    - BartyCrouch
+    - SwiftGen
+    - SwiftLint
+
+SPEC CHECKSUMS:
+  BartyCrouch: 8153d127b1dbaac6850f82bbd68b26be095d7941
+  SwiftGen: 67860cc7c3cfc2ed25b9b74cfd55495fc89f9108
+  SwiftLint: c585ebd615d9520d7fbdbe151f527977b0534f1e
+
+PODFILE CHECKSUM: d45bbaaa03f0f5ffb03c16f40aa76b7ee303b3f9
+
+COCOAPODS: 1.10.0

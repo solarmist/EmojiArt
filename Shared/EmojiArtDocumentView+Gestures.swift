@@ -19,9 +19,7 @@ extension EmojiView {
                 gestureEmojiPanOffset = latestDragValue.translation / zoomScale
             }
             .onEnded { finalDragValue in
-                for emoji in selectedEmoji {
-                    document.moveSelectedEmoji(by: finalDragValue.translation / zoomScale)
-                }
+//                document.moveSelectedEmoji(by: finalDragValue.translation / zoomScale)
                 if !selectedEmoji.contains(self.emoji) {
                     // swiftlint:disable:next shorthand_operator
                     steadyStateEmojiPanOffset = steadyStateEmojiPanOffset + (finalDragValue.translation / zoomScale)
@@ -29,7 +27,18 @@ extension EmojiView {
             }
     }
 }
-
+//private func emojiDragGesture(with emoji: EmojiArt.Emoji?) -> some Gesture {
+//    let gesture = DragGesture()
+//        // swiftlint:disable:next unused_closure_parameter
+//        .updating($gestureEmojiPanOffset) { latestDragGestureValue, gesturePanOffset, transition in
+//            gesturePanOffset = latestDragGestureValue.translation / zoomScale
+//        }
+//        .onEnded { finalDragGestureValue in
+//            document.moveSelectedEmoji(by: finalDragGestureValue.translation / zoomScale)
+//            document.clearSelectedEmoji()
+//        }
+//    return gesture
+//}
 extension EmojiArtDocumentView {
 
     // Give priority to multiple taps

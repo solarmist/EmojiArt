@@ -68,6 +68,17 @@ class EmojiArtDocument: ObservableObject {
         }
     }
 
+    func deleteSelectedEmoji() {
+        for emoji in selectedEmoji {
+            guard let index = emojiArt.emojis.firstIndex(matching: emoji) else {
+                return
+            }
+            print("Deleting: \(emoji.text)")
+
+            emojiArt.remove(at: index)
+        }
+    }
+
     func scaleEmoji(_ emoji: EmojiArt.Emoji, by scale: CGFloat) {
         guard let index = emojiArt.emojis.firstIndex(matching: emoji) else {
             return

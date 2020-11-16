@@ -42,7 +42,6 @@ struct EmojiView: View {
     private func position(for emoji: EmojiArt.Emoji, in size: CGSize) -> CGPoint {
         var location = emoji.location
         location = CGPoint(x: location.x * zoomScale, y: location.y * zoomScale)
-        if 
         location = CGPoint(x: location.x + emojiOffset.width, y: location.y + emojiOffset.height)
         location = CGPoint(x: location.x + panOffset.width, y: location.y + panOffset.height)
         location = CGPoint(x: location.x + size.width / 2, y: location.y + size.height / 2)
@@ -60,6 +59,13 @@ struct EmojiArtDocumentView: View {
             PalletView()
 
             documentBody
+            Button("Delete Emoji") {
+                // TODO: - Doesn't work when there the emoji hasn't sync'ed to the UserDefaults store
+                print("Delete stuff")
+                document.deleteSelectedEmoji()
+            }
+//            .hidden()  // Hide if there's a keyboard?
+            .keyboardShortcut(.delete)
         }
 
     }
@@ -106,6 +112,18 @@ struct EmojiArtDocumentView: View {
             }
         }
     }
+
+//    private func position(for emoji: EmojiArt.Emoji, in size: CGSize) -> CGPoint {
+//        var location = emoji.location
+//        location = CGPoint(x: location.x * zoomScale, y: location.y * zoomScale)
+//        if document.selectedEmoji.contains(emoji) {
+//            location = CGPoint(x: location.x + emojiOffset.width, y: location.y + emojiOffset.height)
+//        }
+//        location = CGPoint(x: location.x + panOffset.width, y: location.y + panOffset.height)
+//        location = CGPoint(x: location.x + size.width / 2, y: location.y + size.height / 2)
+//
+//        return location
+//    }
 
     private func drop(providers: [NSItemProvider], at location: CGPoint) -> Bool {
         var found = providers.loadFirstObject(ofType: URL.self) { url in

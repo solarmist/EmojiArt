@@ -48,6 +48,10 @@ struct EmojiArt: Codable {
         }
     }
 
+    mutating func remove(at index: Int) {
+        emojis.remove(at: index)
+    }
+
     mutating func addEmoji(text: String, location: CGPoint, size: Double) {
         emojis.append(Emoji(text: text, location: location, size: size))
     }
