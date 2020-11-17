@@ -9,28 +9,47 @@ import SwiftUI
 import Combine
 
 class EmojiArtDocument: ObservableObject {
-    static let palette: String = "🦇😱🙀😈🎃👻🍭🍬💀👺👽🕸🤖🧛🏻👾💩👅🧜🏼‍♀️💁🏼‍♀️👯‍♀️🧣🐝"
-
     var documentName: String = "Untitled"
     var documentKey: String { "\(type(of: self)).\(documentName)" }
 
-    @Published private var emojiArt: EmojiArt = EmojiArt() {
-        didSet {
-            UserDefaults.standard.set(emojiArt.json, forKey: documentKey)
+    var backgroundURL: URL? {
+        get { emojiArt.backgroundURL }
+        set {
+            emojiArt.backgroundURL = newValue?.imageURL
+            fetchBackgroundImageData()
         }
     }
 
+    private var fetchBackgroundCancellable: AnyCancellable?
+
+    @Published private var emojiArt: EmojiArt = EmojiArt()
     @Published private(set) var backgroundImage: UIImage?
+
+    private var autosaveCancellable: AnyCancellable?
 
     init() {
         let data = UserDefaults.standard.data(forKey: documentKey)
+        autosaveCancellable = $emojiArt.sink { emojiArt in
+//            print("\(emojiArt.json?.utf8 ?? "nil")")
+            UserDefaults.standard.set(emojiArt.json, forKey: self.documentKey)
+        }
         emojiArt = EmojiArt(json: data) ?? EmojiArt()
         fetchBackgroundImageData()
     }
 
-    // For a progress indicator
-    @Published private(set) var isLoading = false
+    private func fetchBackgroundImageData() {
+        backgroundImage = nil
+        guard let url = emojiArt.backgroundURL else {
+            return
+        }
+        fetchBackgroundCancellable?.cancel()  // Cancel any existing queries
 
+        fetchBackgroundCancellable = URLSession.shared.dataTaskPublisher(for: url)
+            .map {data, _ in UIImage(data: data) }
+            .replaceError(with: nil)
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.backgroundImage, on: self)
+    }
     var emojis: [EmojiArt.Emoji] { emojiArt.emojis }
     @Published private(set) var selectedEmoji: Set<EmojiArt.Emoji> = []
 
@@ -57,17 +76,6 @@ class EmojiArtDocument: ObservableObject {
         emojiArt.addEmoji(text: emoji, location: location, size: Double(size))
     }
 
-    func moveSelectedEmoji(by offset: CGSize) {
-        for emoji in selectedEmoji {
-            guard let index = emojiArt.emojis.firstIndex(matching: emoji) else {
-                return
-            }
-            emojiArt.emojis[index].x += offset.width
-            emojiArt.emojis[index].y += offset.height
-            print("Moved emoji \(emoji.text) to: \(emojiArt.emojis[index].x), \(emojiArt.emojis[index].y)")
-        }
-    }
-
     func deleteSelectedEmoji() {
         for emoji in selectedEmoji {
             guard let index = emojiArt.emojis.firstIndex(matching: emoji) else {
@@ -76,6 +84,28 @@ class EmojiArtDocument: ObservableObject {
             print("Deleting: \(emoji.text)")
 
             emojiArt.remove(at: index)
+        }
+    }
+
+    func moveSelectedEmoji(by offset: CGSize) {
+        for emoji in selectedEmoji {
+            moveEmoji(emoji, by: offset)
+        }
+    }
+
+    func moveEmoji(_ emoji: EmojiArt.Emoji, by offset: CGSize) {
+        guard let index = emojiArt.emojis.firstIndex(matching: emoji) else {
+            return
+        }
+        emojiArt.emojis[index].x += offset.width
+        emojiArt.emojis[index].y += offset.height
+        print("Moved emoji \(emoji.text) to: \(emojiArt.emojis[index].x), \(emojiArt.emojis[index].y)")
+
+    }
+
+    func scaleSelectedEmoji(by scale: CGFloat) {
+        for emoji in selectedEmoji {
+            scaleEmoji(emoji, by: scale)
         }
     }
 
@@ -102,43 +132,6 @@ class EmojiArtDocument: ObservableObject {
         }
         emojiArt.emojis[index].rotation += angle.radians
     }
-
-    func setBackgroundURL(_ url: URL?) {
-        emojiArt.backgroundURL = url?.imageURL
-        fetchBackgroundImageData()
-    }
-
-    private var cancellable: AnyCancellable?
-
-    private func fetchBackgroundImageData() {
-        backgroundImage = nil
-        isLoading = true
-
-        cancel()  // Cancel any existing queries
-        if let url = self.emojiArt.backgroundURL {
-            cancellable = URLSession.shared.dataTaskPublisher(for: url)
-                        .map { UIImage(data: $0.data) }
-                        .replaceError(with: nil)
-                        .receive(on: DispatchQueue.main)
-                        .sink { [weak self] in self?.backgroundImage = $0 }
-            // Explicit version
-//            DispatchQueue.global(qos: .userInitiated).async {
-//                if let imageData = try? Data(contentsOf: url) {
-//                    DispatchQueue.main.async {
-//                        if url == self.emojiArt.backgroundURL {
-//                            self.backgroundImage = UIImage(data: imageData)
-//                            self.isLoading = false
-//                        }
-//                    }
-//                }
-//            }
-        }
-    }
-
-    func cancel() {
-        cancellable?.cancel()
-    }
-
 }
 
 extension EmojiArt.Emoji {

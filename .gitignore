@@ -1,0 +1,7 @@
+build
+Pods
+*xcworkspace
+// Ignore because it contains the secret key
+.bartycrouch.toml
+*.DS_Store*
+*xcuserdata

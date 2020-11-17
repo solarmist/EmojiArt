@@ -7,40 +7,41 @@
 
 import SwiftUI
 
-extension EmojiView {
+// Extension for Dragging groups of emoji around
+extension EmojiArtDocumentView {
     var emojiOffset: CGSize {
-        (steadyStateEmojiPanOffset + gestureEmojiPanOffset) * zoomScale
+        gestureEmojiPanOffset * zoomScale
     }
 
-    var emojiDragGesture: some Gesture {
+    var selectedEmojiPanGesture: some Gesture {
         DragGesture()
             // swiftlint:disable:next unused_closure_parameter
             .updating($gestureEmojiPanOffset) { latestDragValue, gestureEmojiPanOffset, transition in
                 gestureEmojiPanOffset = latestDragValue.translation / zoomScale
             }
             .onEnded { finalDragValue in
-//                document.moveSelectedEmoji(by: finalDragValue.translation / zoomScale)
-                if !selectedEmoji.contains(self.emoji) {
-                    // swiftlint:disable:next shorthand_operator
-                    steadyStateEmojiPanOffset = steadyStateEmojiPanOffset + (finalDragValue.translation / zoomScale)
-                }
+                print("Selected Move")
+                document.moveSelectedEmoji(by: finalDragValue.translation / zoomScale)
+                document.clearSelectedEmoji()
             }
     }
-}
-//private func emojiDragGesture(with emoji: EmojiArt.Emoji?) -> some Gesture {
-//    let gesture = DragGesture()
-//        // swiftlint:disable:next unused_closure_parameter
-//        .updating($gestureEmojiPanOffset) { latestDragGestureValue, gesturePanOffset, transition in
-//            gesturePanOffset = latestDragGestureValue.translation / zoomScale
-//        }
-//        .onEnded { finalDragGestureValue in
-//            document.moveSelectedEmoji(by: finalDragGestureValue.translation / zoomScale)
-//            document.clearSelectedEmoji()
-//        }
-//    return gesture
-//}
-extension EmojiArtDocumentView {
 
+    // Panning works correctly, but zooming moves the coordinates
+    func groupPosition(for emoji: EmojiArt.Emoji, in size: CGSize) -> CGPoint {
+        var location = emoji.location * zoomScale
+
+        if document.selectedEmoji.contains(emoji) {
+            location = CGPoint(x: location.x + emojiOffset.width,
+                               y: location.y + emojiOffset.height)
+        }
+//        location = CGPoint(x: location.x + panOffset.width,
+//                           y: location.y + panOffset.height)
+        // Return frame coords
+        return CGPoint(x: location.x + size.width / 2, y: location.y + size.height / 2)
+    }
+}
+
+extension EmojiArtDocumentView {
     // Give priority to multiple taps
     func emojiTaps(on emoji: EmojiArt.Emoji) -> some Gesture {
         ExclusiveGesture(
@@ -54,7 +55,9 @@ extension EmojiArtDocumentView {
                 }
         )
     }
+}
 
+extension EmojiArtDocumentView {
     var panOffset: CGSize {
         (steadyStatePanOffset + gesturePanOffset) * zoomScale
     }
@@ -70,7 +73,9 @@ extension EmojiArtDocumentView {
                 steadyStatePanOffset = steadyStatePanOffset + (finalDragValue.translation / zoomScale)
             }
     }
+}
 
+extension EmojiArtDocumentView {
     var rotationGesture: some Gesture {
         RotationGesture()
             .onChanged { angle in
@@ -80,7 +85,10 @@ extension EmojiArtDocumentView {
                 document.rotateSelectedEmoji(by: finalAngle)
             }
     }
+}
 
+// Add a zoom gesture
+extension EmojiArtDocumentView {
     var zoomScale: CGFloat {
         steadyStateZoomScale * gestureZoomScale
     }
