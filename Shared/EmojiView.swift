@@ -11,24 +11,29 @@ struct EmojiView: View {
     @EnvironmentObject var document: EmojiArtDocument
     var emoji: EmojiArt.Emoji
 
+    var fontScale: CGFloat
     var zoomScale: CGFloat
+    var rotationAngle = Angle(degrees: 0)
+
+    var fontSize: CGFloat {
+        emoji.fontSize * (document.selectedEmoji.contains(emoji) ? fontScale : 1)
+    }
+
+    var additionalRotation: Angle {
+        document.selectedEmoji.contains(emoji) ? rotationAngle : Angle.degrees(0)
+    }
 
     @GestureState var gestureEmojiPanOffset = CGSize.zero
 
     var body: some View {
 
         Text(emoji.text)
-            .font(animatableWithSize: emoji.fontSize * zoomScale)
+            .font(animatableWithSize: fontSize * zoomScale)
             // Highlight selected emoji
             .overlay(document.selectedEmoji.contains(emoji)
                 ? RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 3)
                 : nil)
-
-    //                        .rotationEffect(emoji.angle + (document.selectedEmoji.contains(emoji)
-    //                                                        ? rotationAngle
-    //                                                        : Angle.degrees(0)))
-    //                        .gesture(rotationGesture)
-//        .position(position(for: emoji, in: geometry.size))
+            .rotationEffect(emoji.angle + additionalRotation)
 //        .gesture(emojiPanGesture)
     }
 
@@ -44,6 +49,6 @@ struct EmojiView_Previews: PreviewProvider {
     }
 
     static var previews: some View {
-        EmojiView(emoji: emoji, zoomScale: 1)
+        EmojiView(emoji: emoji, fontScale: 1, zoomScale: 1)
     }
 }

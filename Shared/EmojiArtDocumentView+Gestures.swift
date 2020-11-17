@@ -75,16 +75,7 @@ extension EmojiArtDocumentView {
     }
 }
 
-extension EmojiArtDocumentView {
-    var rotationGesture: some Gesture {
-        RotationGesture()
-            .onChanged { angle in
-                rotationAngle = angle
-            }
-            .onEnded { finalAngle in
-                document.rotateSelectedEmoji(by: finalAngle)
-            }
-    }
+extension EmojiView {
 }
 
 // Add a zoom gesture
@@ -93,14 +84,30 @@ extension EmojiArtDocumentView {
         steadyStateZoomScale * gestureZoomScale
     }
 
-    var zoomGesture: some Gesture {
-        MagnificationGesture()
-            .updating($gestureZoomScale) { latestGestureScale, gestureZoomScale, _ in
-                gestureZoomScale = latestGestureScale
-            }
-            .onEnded { finalGestureScale in
-                steadyStateZoomScale *= finalGestureScale
-            }
+    var zoomAndRotationGesture: some Gesture {
+        SimultaneousGesture(
+            RotationGesture()
+                .onChanged { angle in
+                    rotationAngle = angle
+                }
+                .onEnded { finalAngle in
+                    document.rotateSelectedEmoji(by: finalAngle)
+                    rotationAngle = Angle.degrees(0)
+                },
+            MagnificationGesture()
+                .updating(document.selectedEmoji.count > 0
+                            ? $fontScale
+                            : $gestureZoomScale
+                ) { latestGestureScale, scaleFactor, _ in
+                    scaleFactor = latestGestureScale
+                }
+                .onEnded { finalGestureScale in
+                    if document.selectedEmoji.count > 0 {
+                        document.scaleSelectedEmoji(by: finalGestureScale)
+                    } else {
+                        steadyStateZoomScale *= finalGestureScale
+                    }
+                })
     }
 
     func doubleTapToZoom(in size: CGSize) -> some Gesture {

@@ -42,13 +42,15 @@ struct EmojiArtDocumentView: View {
                 } else {
                     ForEach(document.emojis) { emoji in
                         EmojiView(emoji: emoji,
-                                  zoomScale: zoomScale
+                                  // We can scale the emoji size independently of the whole document
+                                  fontScale: fontScale,
+                                  zoomScale: zoomScale,
+                                  rotationAngle: rotationAngle
                         )
                         .offset(panOffset)
                         .position(groupPosition(for: emoji, in: geometry.size))
                         .gesture(emojiTaps(on: emoji))
                         .gesture(selectedEmojiPanGesture)
-                        // TODO: - Still need to scale and rotate emoji
                     }
                 }
             }
@@ -56,7 +58,7 @@ struct EmojiArtDocumentView: View {
             .edgesIgnoringSafeArea([.horizontal, .bottom])
             .onTapGesture(count: 1) { document.clearSelectedEmoji() }
             // If zoom is before pan then the panGesture doesn't update properly
-            .gesture(zoomGesture)
+            .gesture(zoomAndRotationGesture)
             .onReceive(document.$backgroundImage) { image in
                 zoomToFit(image, in: geometry.size)
             }
@@ -67,7 +69,7 @@ struct EmojiArtDocumentView: View {
             .onDrop(of: [.image, .text], isTargeted: nil) { providers, location in
                 let frameCoordinates = geometry.convert(location, from: .global)
                 let centerOffset = geometry.size / 2
-                // TODO: - The grab location is ignored for the drop location
+                // todo: - The grab location is ignored for the drop location
                 // The emoji is dropped with its center at the pointer tip
                 var location = CGPoint(x: frameCoordinates.x - centerOffset.width,
                                        y: frameCoordinates.y - centerOffset.height)
@@ -105,13 +107,14 @@ struct EmojiArtDocumentView: View {
 
     // MARK: - State and GestureState
 
-    @State var rotationAngle = Angle(degrees: 0)
     @State var steadyStatePanOffset = CGSize.zero
     @State var steadyStateZoomScale: CGFloat = 1.0
+    @State var rotationAngle = Angle(degrees: 0)
 
     @GestureState var gestureEmojiPanOffset = CGSize.zero
     @GestureState var gesturePanOffset = CGSize.zero
     @GestureState var gestureZoomScale: CGFloat = 1.0
+    @GestureState var fontScale: CGFloat = 1.0
 
 }
 
