@@ -8,19 +8,34 @@
 import SwiftUI
 
 struct EmojiArtDocumentView: View {
-    @EnvironmentObject var document: EmojiArtDocument
+    @ObservedObject var document: EmojiArtDocument
 
     var body: some View {
         VStack {
-            PaletteChooser()
+            PaletteChooser(document: document).environmentObject(document)
 
-            documentBody
-            Button("Delete selected items") {
-                print("Delete selected items")
-                document.deleteSelectedEmoji()
+            documentBody.zIndex(-1)
+            HStack {
+                Spacer()
+                Button(
+                    action: {
+                        print("Delete selected items")
+                        document.deleteSelectedEmoji()
+                    },
+                    label: {
+                        // Try to make a minus badge on the emoji
+                        Text("😀")
+                        Image(systemName: "minus.circle")
+                            .alignmentGuide(.top) { $0.height / 2}
+                            .alignmentGuide(.trailing) { $0.width / 2}
+//                                .offset(x: geometry.size.width/2,
+//                                        y: geometry.size.height/2)
+                                .foregroundColor(.red)
+                    }
+                )
+                    .disabled(document.selectedEmoji.count == 0)
+                    .keyboardShortcut(.delete)
             }
-//            .hidden()  // Hide if there's a keyboard?
-            .keyboardShortcut(.delete)
         }
     }
 
@@ -47,6 +62,7 @@ struct EmojiArtDocumentView: View {
                                   zoomScale: zoomScale,
                                   rotationAngle: rotationAngle
                         )
+                        .environmentObject(document)
                         .offset(panOffset)
                         .position(groupPosition(for: emoji, in: geometry.size))
                         .gesture(emojiTaps(on: emoji))
@@ -60,7 +76,9 @@ struct EmojiArtDocumentView: View {
             // If zoom is before pan then the panGesture doesn't update properly
             .gesture(zoomAndRotationGesture)
             .onReceive(document.$backgroundImage) { image in
-                zoomToFit(image, in: geometry.size)
+                if steadyStateZoomScale == 1 {
+                    zoomToFit(image, in: geometry.size)
+                }
             }
 //            .gesture(zoomGesture.simultaneously(with: RotationGesture().onChanged {
 //                value in
@@ -79,7 +97,67 @@ struct EmojiArtDocumentView: View {
                 // Now scale adjust the distances to the current scale
                 return self.drop(providers: providers, at: location / zoomScale)
             }
-        }
+
+            .navigationBarItems(
+                trailing: Button(
+                    action: {
+                        guard let url = UIPasteboard.general.url,
+                              url == document.backgroundURL else {
+                            explainBackgroundPaste = true
+                            return
+                        }
+
+                        document.backgroundURL = url
+                    },
+                    label: { pasteBackgroundImage }
+                )
+            )
+        }.alert(isPresented: $confirmBackgroundPaste) { confirmBackgroundPasteAlert() }
+
+    }
+    @State var explainBackgroundPaste = false
+    @State var confirmBackgroundPaste = false
+    @Environment(\.undoManager) var undoManager
+
+    // This should probably go in iOS specific code
+    private var pasteBackgroundImage: some View {
+        Button(action: {
+            if let url = UIPasteboard.general.url, url != document.backgroundURL {
+                confirmBackgroundPaste = true
+            } else if UIPasteboard.general.image != nil {
+                confirmBackgroundPaste = true
+            } else {
+                explainBackgroundPaste = true
+            }
+        }, label: {
+            Image(systemName: "doc.on.clipboard").imageScale(.large)
+                .alert(isPresented: $explainBackgroundPaste) {
+                    Alert(
+                        title: Text("Paste Background"),
+                        message: Text("Copy an image to the clip board and touch " +
+                                      "this button to make it the background of your document."),
+                        dismissButton: .default(Text("OK"))
+                    )
+                }
+        })
+    }
+
+    private func confirmBackgroundPasteAlert() -> Alert {
+        let url = UIPasteboard.general.url
+        let pastedThing = url == nil ? "pasted image" : url!.absoluteString
+        return Alert(
+            title: Text("Paste Background"),
+            message: Text("Replace your background with \(pastedThing)?."),
+            primaryButton: .default(Text("OK")) {
+                document.backgroundURL = UIPasteboard.general.url
+//                if url != nil {
+//                    document.setBackgroundURL(url, undoManager: undoManager)
+//                } else if let imageData = UIPasteboard.general.image?.jpegData(compressionQuality: 1.0) {
+//                    document.setBackgroundImageData(imageData, undoManager: undoManager)
+//                }
+            },
+            secondaryButton: .cancel()
+        )
     }
 
     var isLoading: Bool {
@@ -107,9 +185,16 @@ struct EmojiArtDocumentView: View {
 
     // MARK: - State and GestureState
 
-    @State var steadyStatePanOffset = CGSize.zero
-    @State var steadyStateZoomScale: CGFloat = 1.0
     @State var rotationAngle = Angle(degrees: 0)
+
+    // zoom and panOffset have moved back here from EmojiArtDocument
+    // note that in order to store CGSize or CGFloat in a @SceneStorage
+    // we have to make CGSize and CGFloat RawRepresentable
+    // (see EmojiArtExtensions.swift for that)
+    @SceneStorage("EmojiArtDocumentView.panOffset") var steadyStatePanOffset = CGSize.zero
+    @SceneStorage("EmojiArtDocumentView.zoom") var steadyStateZoomScale: CGFloat = 1 {
+        didSet { print("zoom factor: \(oldValue) -> \(steadyStateZoomScale)") }
+    }
 
     @GestureState var gestureEmojiPanOffset = CGSize.zero
     @GestureState var gesturePanOffset = CGSize.zero
@@ -121,6 +206,6 @@ struct EmojiArtDocumentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let emojiArtDoc = EmojiArtDocument()
-        EmojiArtDocumentView().environmentObject(emojiArtDoc)
+        EmojiArtDocumentView(document: emojiArtDoc)
     }
 }

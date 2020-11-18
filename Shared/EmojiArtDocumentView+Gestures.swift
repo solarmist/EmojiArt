@@ -75,10 +75,6 @@ extension EmojiArtDocumentView {
     }
 }
 
-extension EmojiView {
-}
-
-// Add a zoom gesture
 extension EmojiArtDocumentView {
     var zoomScale: CGFloat {
         steadyStateZoomScale * gestureZoomScale
@@ -120,9 +116,7 @@ extension EmojiArtDocumentView {
     }
 
     func zoomToFit(_ image: UIImage?, in size: CGSize) {
-        guard let image = image, image.size.width > 0, image.size.height > 0 else {
-            return
-        }
+        guard let image = image, min(image.size.width, image.size.height, size.height, size.width) > 0 else { return }
         let hZoom = size.width / image.size.width
         let vZoom = size.height / image.size.height
         steadyStatePanOffset = .zero
