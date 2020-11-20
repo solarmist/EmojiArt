@@ -189,42 +189,6 @@ extension String {
     }
 }
 
-extension UIImage {
-    // Lecture 14 support
-    // stores ourself as jpeg in a file in the filesystem
-    // in the Application Support directory in our sandbox
-    // with the given name (or a unique name if no name provided)
-    // and returns the URL to it
-    // care must be taken if you hold on to a URL like this persistently
-    // because your Application Support directory's URL
-    // can change between instances of your application
-    // (see some hackery in imageURL above to account for this)
-    // if you wanted to hold on to a URL like this in the real world
-    // (i.e. not in demo-ware)
-    // you'd probably just hold onto the end part of the URL
-    // (i.e. not including the Application Support directory's URL)
-    // and then always prepend Application Support's URL upon use of the URL fragment
-    // this function might also want to add a parameter for the compression quality
-    // (currently it is best-quality compression)
-    func storeInFilesystem(name: String = "\(Date().timeIntervalSince1970)") -> URL? {
-        var url = try? FileManager.default.url(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: true
-        )
-        url = url?.appendingPathComponent(name)
-        if url != nil {
-            do {
-                try self.jpegData(compressionQuality: 1.0)?.write(to: url!)
-            } catch {
-                url = nil
-            }
-        }
-        return url
-    }
-}
-
 // new
 // CGSize and CGFloat are made to be RawRepresentable
 // so that they can be used with @SceneStorage

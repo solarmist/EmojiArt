@@ -18,6 +18,8 @@
 		7E1B52D42564A5BD00A79A61 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E1B52D12564A5BD00A79A61 /* Grid.swift */; };
 		7E1B52D52564A5BD00A79A61 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E1B52D12564A5BD00A79A61 /* Grid.swift */; };
 		7E316FF625684675007F46CC /* EmojiArtDocumentView+iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E316FF525684675007F46CC /* EmojiArtDocumentView+iOS.swift */; };
+		7E31761325687A6800DB59CD /* EmojiArtDocumentView+macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EECE792256849C600FD88E0 /* EmojiArtDocumentView+macOS.swift */; };
+		7E31761825687B0800DB59CD /* EmojiArtDocumentView+Gestures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E706D7125620A3500EF5B88 /* EmojiArtDocumentView+Gestures.swift */; };
 		7E5C394D25609A34001CBD97 /* EmojiArtApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C393A25609A33001CBD97 /* EmojiArtApp.swift */; };
 		7E5C394E25609A34001CBD97 /* EmojiArtApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C393A25609A33001CBD97 /* EmojiArtApp.swift */; };
 		7E5C394F25609A34001CBD97 /* EmojiArtDocumentViewShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5C393B25609A33001CBD97 /* EmojiArtDocumentViewShared.swift */; };
@@ -346,6 +348,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7E31761825687B0800DB59CD /* EmojiArtDocumentView+Gestures.swift in Sources */,
+				7E31761325687A6800DB59CD /* EmojiArtDocumentView+macOS.swift in Sources */,
 				7E63C3552561C37D00129EF4 /* AnimatableSystemFontModifier.swift in Sources */,
 				7EC1E20925684B4B00D5AD8F /* EmojiArtDocumentPalette.swift in Sources */,
 				7E7030AD2564534500C747A5 /* EmojiView+Gestures.swift in Sources */,

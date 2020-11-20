@@ -12,10 +12,12 @@ struct OptionalImage: View {
 
     @ViewBuilder
     var body: some View {
-        Group {
-            if uiImage != nil {
-                Image(uiImage: uiImage!)
-            }
+        if uiImage != nil {
+            #if os(macOS)
+            Image(nsImage: uiImage!)
+            #else
+            Image(uiImage: uiImage!)
+            #endif
         }
     }
 }
