@@ -1,2 +1,2 @@
 # EmojiArt
-CS192P - SwiftUI EmojiArt project
+Demo - Create Art using Emoji on a background of your choice.
