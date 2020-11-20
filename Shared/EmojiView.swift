@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct EmojiView: View {
-    @EnvironmentObject var document: EmojiArtDocument
-    var emoji: EmojiArt.Emoji
+    @ObservedObject var document: EmojiArtDocument
+    var emoji: EmojiArtModel.Emoji
 
     var fontScale: CGFloat
     var zoomScale: CGFloat
@@ -38,17 +38,17 @@ struct EmojiView: View {
     }
 
 }
-
-struct EmojiView_Previews: PreviewProvider {
-    static var emoji: EmojiArt.Emoji {
-        let document = EmojiArtDocument()
-        document.addEmoji("👯‍♀️",
-                          at: CGPoint(x: 0, y: 0),
-                          size: 1)
-        return document.emojis[0]
-    }
-
-    static var previews: some View {
-        EmojiView(emoji: emoji, fontScale: 1, zoomScale: 1)
-    }
-}
+//
+//struct EmojiView_Previews: PreviewProvider {
+//    static var emoji: EmojiArtModel.Emoji {
+//        let document = EmojiArtDocument()
+//        document.addEmoji("👯‍♀️",
+//                          at: CGPoint(x: 0, y: 0),
+//                          size: 1)
+//        return document.emojis[0]
+//    }
+//
+//    static var previews: some View {
+//        EmojiView(emoji: emoji, fontScale: 1, zoomScale: 1)
+//    }
+//}

@@ -1,6 +1,6 @@
 //
 //  Spinning.swift
-//  EmojiArt (iOS)
+//  EmojiArt
 //
 //  Created by Joshua Olson on 11/16/20.
 //

@@ -1,14 +1,16 @@
 //
 //  EmojiArt.swift
-//  EmojiArt
+//  EmojiArtModel
 //
 //  Created by Joshua Olson on 11/14/20.
 //
 
 import SwiftUI
 
-struct EmojiArt: Codable {
+struct EmojiArtModel: Codable {
     var backgroundURL: URL?
+    var backgroundImageData: Data?
+
     var emojis = [Emoji]()
 
     struct Emoji: Identifiable, Codable, Hashable {
@@ -40,7 +42,7 @@ struct EmojiArt: Codable {
     init() { }
 
     init?(json: Data?) {
-        if json != nil, let newEmojiArt = try? JSONDecoder().decode(EmojiArt.self, from: json!) {
+        if json != nil, let newEmojiArt = try? JSONDecoder().decode(EmojiArtModel.self, from: json!) {
             self = newEmojiArt
         } else {
             // Only return nil if it fails to load

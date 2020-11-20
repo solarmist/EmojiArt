@@ -1,6 +1,6 @@
 //
-//  EmojiArtDocumentView+Gestures.swift
-//  EmojiArt (iOS)
+//  EmojiArtDocumentViewShared+Gestures.swift
+//  EmojiArt
 //
 //  Created by Joshua Olson on 11/15/20.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 // Extension for Dragging groups of emoji around
-extension EmojiArtDocumentView {
+extension EmojiArtDocumentViewShared {
     var emojiOffset: CGSize {
         gestureEmojiPanOffset * zoomScale
     }
@@ -20,14 +20,13 @@ extension EmojiArtDocumentView {
                 gestureEmojiPanOffset = latestDragValue.translation / zoomScale
             }
             .onEnded { finalDragValue in
-                print("Selected Move")
                 document.moveSelectedEmoji(by: finalDragValue.translation / zoomScale)
                 document.clearSelectedEmoji()
             }
     }
 
     // Panning works correctly, but zooming moves the coordinates
-    func groupPosition(for emoji: EmojiArt.Emoji, in size: CGSize) -> CGPoint {
+    func groupPosition(for emoji: EmojiArtModel.Emoji, in size: CGSize) -> CGPoint {
         var location = emoji.location * zoomScale
 
         if document.selectedEmoji.contains(emoji) {
@@ -41,9 +40,9 @@ extension EmojiArtDocumentView {
     }
 }
 
-extension EmojiArtDocumentView {
+extension EmojiArtDocumentViewShared {
     // Give priority to multiple taps
-    func emojiTaps(on emoji: EmojiArt.Emoji) -> some Gesture {
+    func emojiTaps(on emoji: EmojiArtModel.Emoji) -> some Gesture {
         ExclusiveGesture(
             TapGesture(count: 2)
                 .onEnded {
@@ -57,7 +56,7 @@ extension EmojiArtDocumentView {
     }
 }
 
-extension EmojiArtDocumentView {
+extension EmojiArtDocumentViewShared {
     var panOffset: CGSize {
         (steadyStatePanOffset + gesturePanOffset) * zoomScale
     }
@@ -75,7 +74,7 @@ extension EmojiArtDocumentView {
     }
 }
 
-extension EmojiArtDocumentView {
+extension EmojiArtDocumentViewShared {
     var zoomScale: CGFloat {
         steadyStateZoomScale * gestureZoomScale
     }

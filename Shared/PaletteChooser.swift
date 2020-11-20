@@ -1,6 +1,6 @@
 //
 //  PaletteChooser.swift
-//  EmojiArt (iOS)
+//  EmojiArt
 //
 //  Created by Joshua Olson on 11/15/20.
 //
@@ -12,9 +12,10 @@ struct PaletteChooser: View {
     @State private var showPaletteEditor = false
     @ObservedObject var document: EmojiArtDocument
 
-    init(document: EmojiArtDocument) {
-        self.document = document
-        _chosenPalette = State(wrappedValue: document.defaultPalette)
+    init(chosenPalette: String, document: ObservedObject<EmojiArtDocument>) {
+        _document = document
+
+        _chosenPalette = State(wrappedValue: chosenPalette)
     }
 
     var body: some View {
@@ -34,7 +35,8 @@ struct PaletteChooser: View {
                 }
 //                    .sheet(isPresented: $showPaletteEditor) {
                     .popover(isPresented: $showPaletteEditor) {
-                        PaletteEditor(chosenPalette: $chosenPalette, isShowing: $showPaletteEditor)
+                        PaletteEditor(chosenPalette: $chosenPalette,
+                                      isShowing: $showPaletteEditor)
                             .frame(minWidth: 300, minHeight: 500)
                     }
             }.fixedSize(horizontal: true, vertical: false)
@@ -121,9 +123,9 @@ struct PaletteEditor: View {
     @ScaledMetric var fontSize: CGFloat = 40
 
 }
-
-struct PalletView_Previews: PreviewProvider {
-    static var previews: some View {
-        PaletteChooser(document: EmojiArtDocument())
-    }
-}
+//
+//struct PalletView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        PaletteChooser(document: EmojiArtDocument())
+//    }
+//}
