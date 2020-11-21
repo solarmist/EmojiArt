@@ -9,10 +9,10 @@ import SwiftUI
 
 @main
 struct EmojiArtApp: App {
+
     var body: some Scene {
-        // For ReferenceFileDocument
-        DocumentGroup(newDocument: EmojiArtDocument.init) { file in
-            EmojiArtDocumentViewShared(document: file.document)
+        DocumentGroup(newDocument: EmojiArtDocument.init) { config in
+            EmojiArtDocumentView(document: config.document)
         }
     }
 }

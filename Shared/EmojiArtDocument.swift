@@ -67,7 +67,7 @@ class EmojiArtDocument: ReferenceFileDocument {
         fetchBackgroundCancellable?.cancel()  // Cancel any existing queries
 
         fetchBackgroundCancellable = URLSession.shared.dataTaskPublisher(for: url)
-            .map {data, _ in UIImage(data: data) }
+            .map { data, _ in UIImage(data: data) }
             .replaceError(with: nil)
             .receive(on: DispatchQueue.main)
             .assign(to: \.backgroundImage, on: self)

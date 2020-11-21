@@ -9,15 +9,18 @@ import SwiftUI
 
 struct EmojiArtDocumentViewShared: View {
     @ObservedObject var document: EmojiArtDocument
+    @State private var chosenPalette: String = ""
     @Environment(\.undoManager) var undoManager
 
     var body: some View {
-        document.undoManager = undoManager
+        if document.undoManager == nil && undoManager != nil {
+            document.undoManager = undoManager
+        }
 
         return VStack {
-            PaletteChooser(chosenPalette: document.defaultPalette, document: _document)
-
-            documentBody.zIndex(-1)
+            documentBody
+                .zIndex(-1)
+                .frame(minWidth: 350, minHeight: 350)
             HStack {
                 Spacer()
                 Button(
@@ -26,19 +29,19 @@ struct EmojiArtDocumentViewShared: View {
                         document.deleteSelectedEmoji()
                     },
                     label: {
-                        // Try to make a minus badge on the emoji
-                        Text("😀")
-                        Image(systemName: "minus.circle")
-                            .alignmentGuide(.top) { $0.height / 2}
-                            .alignmentGuide(.trailing) { $0.width / 2}
-//                                .offset(x: geometry.size.width/2,
-//                                        y: geometry.size.height/2)
+                        ZStack(alignment: .topTrailing) {
+                            Text("😀").imageScale(.large)
+                            Image(systemName: "minus.circle.fill")
                                 .foregroundColor(.red)
+                                .font(.headline).imageScale(.small)
+                                .opacity(true ? 1 : 0)
+                        }
                     }
                 )
                     .disabled(document.selectedEmoji.count == 0)
                     .keyboardShortcut(.delete)
             }
+            PaletteChooser(document: document, chosenPalette: $chosenPalette)
         }
     }
 

@@ -8,15 +8,9 @@
 import SwiftUI
 
 struct PaletteChooser: View {
-    @State private var chosenPalette: String
-    @State private var showPaletteEditor = false
     @ObservedObject var document: EmojiArtDocument
-
-    init(chosenPalette: String, document: ObservedObject<EmojiArtDocument>) {
-        _document = document
-
-        _chosenPalette = State(wrappedValue: chosenPalette)
-    }
+    @Binding var chosenPalette: String
+    @State private var showPaletteEditor = false
 
     var body: some View {
         HStack {

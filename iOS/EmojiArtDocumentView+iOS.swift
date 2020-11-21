@@ -12,9 +12,13 @@ struct EmojiArtDocumentView: View {
     @ObservedObject var document: EmojiArtDocument
 
     var body: some View {
-        EmojiArtDocumentViewShared(document: document)
+        if document.undoManager == nil && undoManager != nil {
+            document.undoManager = undoManager
+        }
+        return EmojiArtDocumentViewShared(document: document)
             .navigationBarItems(trailing: iOSOnlyToolbarItems)
-            .alert(isPresented: $confirmBackgroundPaste, content: confirmBackgroundPasteAlert)
+            .alert(isPresented: $confirmBackgroundPaste,
+                   content: confirmBackgroundPasteAlert)
     }
 
     @State var explainBackgroundPaste = false
