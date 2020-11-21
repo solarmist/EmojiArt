@@ -21,14 +21,60 @@ struct EmojiArtDocumentView: View {
                    content: confirmBackgroundPasteAlert)
     }
 
-    @State var explainBackgroundPaste = false
-    @State var confirmBackgroundPaste = false
+    @State var showImagePicker = false
+    @State var imagePickerSourceType = UIImagePickerController.SourceType.photoLibrary
 
     private var iOSOnlyToolbarItems: some View {
         HStack(spacing: 20) {
+            photoLibraryImagePicker
+            if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                cameraImagePicker
+            }
             pasteBackgroundImage
         }
+        .sheet(isPresented: $showImagePicker) {
+            imagePicker
+        }
     }
+
+    private var photoLibraryImagePicker: some View {
+        Image(systemName: "photo")
+            .imageScale(.large)
+            .foregroundColor(.accentColor)
+            .onTapGesture {
+                imagePickerSourceType = .photoLibrary
+                showImagePicker = true
+            }
+
+    }
+
+    private var cameraImagePicker: some View {
+        Image(systemName: "camera")
+            .imageScale(.large)
+            .foregroundColor(.accentColor)
+            .onTapGesture {
+                imagePickerSourceType = .camera
+                showImagePicker = true
+            }
+    }
+
+    private var imagePicker: some View {
+        ImagePicker(sourceType: imagePickerSourceType) { image in
+            guard image != nil else { return }
+            // Throw it on the main queue for after the UI finishes handling
+            // showing the image picker stuff and putting it away
+            // To avoid something like: "Not allowed to modify view while constructing body", etc.
+            DispatchQueue.main.async {
+                guard let imageData = image?.jpegData(compressionQuality: 1.0) else { return }
+                print("Setting background image")
+                document.setBackgroundImageData(imageData)
+            }
+            showImagePicker = false
+        }
+    }
+
+    @State var explainBackgroundPaste = false
+    @State var confirmBackgroundPaste = false
 
     private var pasteBackgroundImage: some View {
         Button(action: {

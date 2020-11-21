@@ -95,6 +95,10 @@ class EmojiArtDocument: ReferenceFileDocument {
         let oldEmojiArt = emojiArt
         doit()
 
+        if undoManager == nil {
+            print("No undoManager")
+        }
+
         if startGroupIfNotInGroup && !inUndoGroup {
             inUndoGroup = true
             undoManager?.beginUndoGrouping()

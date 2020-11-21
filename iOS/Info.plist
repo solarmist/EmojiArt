@@ -88,5 +88,7 @@
 			</dict>
 		</dict>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>EmojiArt lets you set the background of your document using the camera</string>
 </dict>
 </plist>
