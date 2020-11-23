@@ -6,11 +6,18 @@
 //
 
 import SwiftUI
+#if os(iOS)
+import PencilKit
+#endif
 
 struct EmojiArtDocumentViewShared: View {
     @ObservedObject var document: EmojiArtDocument
     @State private var chosenPalette: String = ""
     @Environment(\.undoManager) var undoManager
+
+    #if os(iOS)
+    @State var pkCanvasView = PKCanvasView()
+    #endif
 
     var body: some View {
         if document.undoManager == nil && undoManager != nil {
@@ -51,9 +58,11 @@ struct EmojiArtDocumentViewShared: View {
                 // Background
                 Color.white.overlay(
                     OptionalImage(uiImage: document.backgroundImage)
-                        .scaleEffect(zoomScale)
-                )
-                    .offset(panOffset)
+                            .scaleEffect(zoomScale)
+                    )
+                // TODO: - Get Background Image to show up again
+                canvasView
+                    // Don't scale the canvas. Scale the drawing on the canvas
                     .gesture(doubleTapToZoom(in: geometry.size))
                     .gesture(panGesture)
 

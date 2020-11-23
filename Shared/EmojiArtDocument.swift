@@ -8,6 +8,9 @@
 import SwiftUI
 import Combine
 import UniformTypeIdentifiers
+#if os(iOS)
+import PencilKit
+#endif
 
 extension UTType {
     static var emojiart = UTType(exportedAs: "solarmist.emojiart")
@@ -121,6 +124,23 @@ class EmojiArtDocument: ReferenceFileDocument {
     }
 
     // MARK: - Intent(s)
+
+    func undo() {
+        undoManager?.undo()
+    }
+
+    func redo() {
+        undoManager?.redo()
+    }
+
+    #if os(iOS)
+    var drawing: PKDrawing { emojiArt.drawing }
+    func drawingChanged(_ drawing: PKDrawing) {
+        undoablyPerform(operation: "Drawing") {
+            emojiArt.drawing = drawing
+        }
+    }
+    #endif
 
     // Selection should begin/end an UndoGroup
 

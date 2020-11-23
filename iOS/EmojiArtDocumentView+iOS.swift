@@ -16,7 +16,16 @@ struct EmojiArtDocumentView: View {
             document.undoManager = undoManager
         }
         return EmojiArtDocumentViewShared(document: document)
-            .navigationBarItems(trailing: iOSOnlyToolbarItems)
+            .navigationBarItems(
+                leading: HStack {
+                    Button(action: {document.undo()},
+                           label: { Image(systemName: "arrow.uturn.backward") })
+                        .disabled(!(document.undoManager?.canUndo ?? false))
+                    Button(action: {document.redo()},
+                           label: { Image(systemName: "arrow.uturn.forward") })
+                        .disabled(!(document.undoManager?.canRedo ?? false))
+                },
+                trailing: iOSOnlyToolbarItems)
             .alert(isPresented: $confirmBackgroundPaste,
                    content: confirmBackgroundPasteAlert)
     }
@@ -116,6 +125,24 @@ struct EmojiArtDocumentView: View {
         )
     }
 }
+
+// Extend the document view with PencilKit
+extension EmojiArtDocumentViewShared {
+    var canvasView: some View {
+        if pkCanvasView.drawing != document.drawing {
+            pkCanvasView.drawing = document.drawing
+        }
+        pkCanvasView.backgroundColor = .clear
+        pkCanvasView.isOpaque = false
+        let view = CanvasView(
+            canvasView: $pkCanvasView,
+            zoomScale: .constant(zoomScale),
+            contentOffset: .constant(CGPoint.zero + panOffset),
+            onSaved: document.drawingChanged)
+        return view
+    }
+}
+
 //
 //struct EmojiArtDocumentView_Previews: PreviewProvider {
 //    static var previews: some View {

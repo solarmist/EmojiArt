@@ -14,5 +14,21 @@ struct EmojiArtDocumentView: View {
 
     var body: some View {
         EmojiArtDocumentViewShared(document: document)
+            .navigationBarItems(
+                leading: HStack {
+                    Button(action: {document.undo()},
+                           label: { Image(systemName: "arrow.uturn.backward") })
+                        .disabled(!(document.undoManager?.canUndo ?? false))
+                    Button(action: {document.redo()},
+                           label: { Image(systemName: "arrow.uturn.forward") })
+                        .disabled(!(document.undoManager?.canRedo ?? false))
+                })
+    }
+}
+
+extension EmojiArtDocumentViewShared {
+    var canvasView: some View {
+        Color.white
+        )
     }
 }

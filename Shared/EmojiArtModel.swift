@@ -6,10 +6,18 @@
 //
 
 import SwiftUI
+#if os(iOS)
+import PencilKit
+#endif
 
+// Renamed to not collide with App name
 struct EmojiArtModel: Codable {
     var backgroundURL: URL?
     var backgroundImageData: Data?
+
+    #if os(iOS)
+    var drawing: PKDrawing = PKDrawing()
+    #endif
 
     var emojis = [Emoji]()
 
